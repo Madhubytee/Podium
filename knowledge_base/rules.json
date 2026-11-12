@@ -1,0 +1,390 @@
+{
+  "version": 1,
+  "notes": "Podium expert rules. Thresholds come from our domain experts; tune them here, never in code. Condition and fact reference: knowledge_base/FACTS.md.",
+
+  "conflict_resolution": {
+    "rule": 16,
+    "name": "Conflict resolution",
+    "focus_count": 2,
+    "count_boost": 0.1,
+    "max_count_boost": 1.0,
+    "stale_after_takes": 3,
+    "stale_penalty": 0.5
+  },
+
+  "scoring": {
+    "start": 100,
+    "points_per_severity": 15,
+    "area_cap": 25
+  },
+
+  "rules": [
+    {
+      "id": 1, "key": "too_fast", "name": "Speaking too fast", "area": "Pace", "kind": "fix", "severity": 0.6,
+      "occasions": ["all"],
+      "if": {"fact": "pace_wpm", "op": ">", "value": 170},
+      "moments": {"fact": "pace_window", "op": ">", "value": 170},
+      "then": {
+        "why": "Over 170 words per minute is hard for listeners to follow, and it reads as nervous.",
+        "tip": "Slow down to about 140 to 160 words per minute. Land each key point, then breathe.",
+        "drill": "Read your opening out loud with a metronome at 140 beats per minute, one word per beat."
+      }
+    },
+    {
+      "id": 2, "key": "too_slow", "name": "Speaking too slowly", "area": "Pace", "kind": "fix", "severity": 0.5,
+      "occasions": ["all"],
+      "if": {"fact": "pace_wpm", "op": "<", "value": 110},
+      "moments": {"fact": "pace_window", "op": "<", "value": 110},
+      "then": {
+        "why": "Under 110 words per minute can sound unsure or unprepared, and the audience drifts.",
+        "tip": "Pick up the pace a little and cut long setups. Know your next sentence before you finish this one.",
+        "drill": "Say your main point in 30 seconds, then in 20, then in 15."
+      }
+    },
+    {
+      "id": 3, "key": "filler_heavy", "name": "Lots of filler words", "area": "Fillers", "kind": "fix", "severity": 0.7,
+      "occasions": ["all"],
+      "if": {"fact": "filler_per_min", "op": ">", "value": 5},
+      "moments": {"fact": "filler"},
+      "then": {
+        "why": "More than 5 fillers a minute makes you sound less sure of what you're saying.",
+        "tip": "When you feel an 'um' coming, close your mouth and pause instead. Silence sounds confident.",
+        "drill": "Talk about your topic for 60 seconds while a friend taps the table at every filler. Aim for zero taps."
+      }
+    },
+    {
+      "id": 4, "key": "lost_place", "name": "Pauses that sound like you lost your place", "area": "Pauses", "kind": "fix", "severity": 0.6,
+      "occasions": ["all"],
+      "if": {"fact": "pause", "tag": "mid_sentence", "op": ">=", "value": 2.0, "min_count": 2},
+      "moments": {"fact": "pause", "tag": "mid_sentence", "op": ">=", "value": 2.0},
+      "then": {
+        "why": "Long stops in the middle of a sentence sound like you forgot what comes next.",
+        "tip": "Finish the sentence, then pause. Keep a 3 to 5 word outline of each section in your head.",
+        "drill": "Write one keyword per section on a card and practice moving from card to card without stopping mid sentence."
+      }
+    },
+    {
+      "id": 5, "key": "no_emphasis_pauses", "name": "No room to breathe", "area": "Pauses", "kind": "fix", "severity": 0.4,
+      "occasions": ["presentation", "speech"],
+      "if": {"all": [
+        {"fact": "emphasis_pause_per_min", "op": "<", "value": 2},
+        {"fact": "duration_s", "op": ">", "value": 45}
+      ]},
+      "then": {
+        "why": "Without pauses between ideas, nothing stands out and the audience can't absorb your points.",
+        "tip": "Pause for a full second after each key point and before your big lines.",
+        "drill": "Mark a slash in your script after every key sentence and hold a silent count of two at each one."
+      }
+    },
+    {
+      "id": 6, "key": "monotone", "name": "Monotone voice", "area": "Voice", "kind": "fix", "severity": 0.6,
+      "occasions": ["all"], "occasion_weight": {"speech": 1.3, "pitch": 1.2},
+      "if": {"fact": "pitch_sd_hz", "op": "<", "value": 20},
+      "then": {
+        "why": "Your pitch barely moves (under 20 Hz of variation), which makes even great content sound flat.",
+        "tip": "Let your voice rise on questions and exciting moments, and drop it for serious ones.",
+        "drill": "Read one paragraph three times: as a bedtime story, as a sports announcer, then somewhere in between."
+      }
+    },
+    {
+      "id": 7, "key": "trailing_off", "name": "Trailing off at the end of sentences", "area": "Voice", "kind": "fix", "severity": 0.4,
+      "occasions": ["all"],
+      "if": {"fact": "sentence_end_drop", "op": ">", "value": 6, "min_count": 3, "min_ratio": 0.4},
+      "moments": {"fact": "sentence_end_drop", "op": ">", "value": 6},
+      "then": {
+        "why": "Your volume drops at the end of many sentences, and the last words are usually the important ones.",
+        "tip": "Keep your energy all the way through the last word, as if it's the punchline.",
+        "drill": "Say each sentence of your opening and slightly stress the final word."
+      }
+    },
+    {
+      "id": 8, "key": "mumbling", "name": "Hard to understand", "area": "Clarity", "kind": "fix", "severity": 0.5,
+      "occasions": ["all"],
+      "if": {"fact": "clarity", "op": "<", "value": 0.7},
+      "moments": {"fact": "unclear_word"},
+      "then": {
+        "why": "The transcriber was unsure about many of your words, which usually means mumbling or swallowed endings.",
+        "tip": "Open your mouth a little more and finish the consonants at the ends of words.",
+        "drill": "Read a paragraph with a pen held lightly between your teeth, then read it again without it."
+      }
+    },
+    {
+      "id": 9, "key": "low_eye_contact", "name": "Low eye contact", "area": "Body language", "kind": "fix", "severity": 0.6,
+      "occasions": ["all"], "occasion_weight": {"interview": 1.2, "debate": 1.1},
+      "if": {"fact": "eye_contact_pct", "op": "<", "value": 60},
+      "moments": {"fact": "looking_away"},
+      "then": {
+        "why": "You faced the camera less than 60% of the time. People trust speakers who look at them.",
+        "tip": "Treat the camera lens as a person's eyes. Glance away to think, then come back.",
+        "drill": "Put a small sticker next to your webcam and finish every sentence looking at it."
+      }
+    },
+    {
+      "id": 10, "key": "still_hands", "name": "Hands still or hidden", "area": "Body language", "kind": "fix", "severity": 0.3,
+      "occasions": ["presentation", "pitch", "speech", "debate"],
+      "if": {"fact": "hands_still_pct", "op": ">", "value": 80},
+      "then": {
+        "why": "Your hands were still or out of frame over 80% of the time. Gestures make you look relaxed and help people follow.",
+        "tip": "Keep your hands in frame at waist height and use them to show size, lists, and contrasts.",
+        "drill": "Practice one section where every main point gets a gesture: count on fingers, show big vs small."
+      }
+    },
+    {
+      "id": 11, "key": "swaying", "name": "Swaying or rocking", "area": "Body language", "kind": "fix", "severity": 0.3,
+      "occasions": ["presentation", "pitch", "speech"],
+      "if": {"fact": "sway_per_10s", "op": ">=", "value": 2},
+      "moments": {"fact": "sway"},
+      "then": {
+        "why": "You rocked side to side several times every 10 seconds, which pulls attention away from your words.",
+        "tip": "Plant your feet hip width apart and only move with a purpose, like stepping forward for a key point.",
+        "drill": "Practice your opening standing on a sheet of paper without letting your feet slide."
+      }
+    },
+    {
+      "id": 12, "key": "hedging_apologizing", "name": "Hedging and apologizing", "area": "Language", "kind": "fix", "severity": 0.5,
+      "occasions": ["interview", "pitch", "presentation"],
+      "if": {"any": [
+        {"fact": "hedge_count", "op": ">=", "value": 3},
+        {"fact": "apology_count", "op": ">=", "value": 2}
+      ]},
+      "moments": {"any": [{"fact": "hedge"}, {"fact": "apology"}]},
+      "then": {
+        "why": "Phrases like 'I think maybe' and 'sorry' undercut your authority.",
+        "tip": "Say what you know directly. Replace 'I think we could' with 'We will'.",
+        "drill": "Write out your three main points with no qualifiers, then say them out loud exactly as written."
+      }
+    },
+    {
+      "id": 13, "key": "long_answer", "name": "Answers running long", "area": "Structure", "kind": "fix", "severity": 0.7,
+      "occasions": ["interview"],
+      "if": {"fact": "answer", "op": ">", "value": 120},
+      "moments": {"fact": "answer", "op": ">", "value": 120},
+      "then": {
+        "why": "An answer over 2 minutes loses the interviewer. Most strong answers land in 60 to 90 seconds.",
+        "tip": "Use the STAR format: Situation, Task, Action, Result, about one or two sentences each.",
+        "drill": "Retell your longest answer in STAR format with a 90 second timer running."
+      }
+    },
+    {
+      "id": 14, "key": "no_call_to_action", "name": "No clear ask at the end", "area": "Structure", "kind": "fix", "severity": 0.8,
+      "occasions": ["pitch"],
+      "if": {"fact": "has_cta_end", "op": "==", "value": false},
+      "moments": {"fact": "has_cta_end"},
+      "then": {
+        "why": "There was no call to action in your last 20%, so listeners don't know what you want from them.",
+        "tip": "End with one specific ask: an amount, a meeting, a sign up, or a next step.",
+        "drill": "Write your ask in one sentence with a number in it, and make it the last thing you say."
+      }
+    },
+    {
+      "id": 15, "key": "nervous_rushing", "name": "Nervous rushing", "area": "Combined", "kind": "fix", "severity": 0.8,
+      "occasions": ["presentation", "pitch"],
+      "if": {"all": [
+        {"fact": "pace_wpm", "op": ">", "value": 160},
+        {"fact": "filler_per_min", "op": ">", "value": 3}
+      ]},
+      "moments": {"fact": "pace_window", "op": ">", "value": 160},
+      "suppresses": [1],
+      "then": {
+        "why": "Fast pace plus frequent fillers is the classic sign of nerves.",
+        "tip": "You're likely nervous and rushing. Take one slow breath before you start, and pause after each main point.",
+        "drill": "Read your first paragraph at half speed three times."
+      }
+    },
+    {
+      "id": 17, "key": "improved", "name": "Improvement since last take", "area": "Progress", "kind": "strength", "severity": 0.5,
+      "occasions": ["all"],
+      "if": {"fact": "metric_change", "op": ">", "value": 15},
+      "then": {
+        "why": "At least one of your metrics improved by more than 15% since your last take.",
+        "tip": "Whatever you changed is working. Keep it up.",
+        "drill": ""
+      }
+    },
+
+    {
+      "id": 18, "key": "reading_slides", "name": "Reading from notes or slides", "area": "Body language", "kind": "fix", "severity": 0.7,
+      "occasions": ["presentation"],
+      "if": {"fact": "looking_down_pct", "op": ">", "value": 40},
+      "moments": {"fact": "looking_away"},
+      "suppresses": [9],
+      "then": {
+        "why": "You were looking down over 40% of the time, which usually means reading.",
+        "tip": "Know your key points well enough to glance at slides only for cues.",
+        "drill": "Practice each slide by saying its key point from memory before looking at it."
+      }
+    },
+    {
+      "id": 19, "key": "weak_opening", "name": "Weak opening", "area": "Structure", "kind": "fix", "severity": 0.5,
+      "occasions": ["pitch", "presentation", "speech"],
+      "if": {"fact": "has_hook", "op": "==", "value": false},
+      "moments": {"fact": "has_hook"},
+      "then": {
+        "why": "Your first 15 seconds had no hook: no question, number, or story to pull people in.",
+        "tip": "Open with a surprising number, a question, or a 2 sentence story.",
+        "drill": "Write three different first sentences and try each out loud. Keep the one that makes you lean in."
+      }
+    },
+    {
+      "id": 20, "key": "nerves_at_start", "name": "Nerves at the start", "area": "Combined", "kind": "fix", "severity": 0.9,
+      "occasions": ["pitch", "presentation"],
+      "if": {"all": [
+        {"fact": "nervous_rushing", "op": "==", "value": true},
+        {"fact": "weak_opening", "op": "==", "value": true}
+      ]},
+      "moments": {"fact": "pace_window", "op": ">", "value": 160, "within": "first_20pct"},
+      "suppresses": [15, 19],
+      "then": {
+        "why": "You rushed and skipped the hook, which means the first impression is where the nerves hit hardest.",
+        "tip": "Memorize your first two sentences word for word and say them slowly. The rest gets easier.",
+        "drill": "Record just your first 20 seconds five times in a row until it feels calm."
+      }
+    },
+    {
+      "id": 21, "key": "debate_hedging", "name": "Hedging your claims", "area": "Language", "kind": "fix", "severity": 0.8,
+      "occasions": ["debate"],
+      "if": {"fact": "hedge_count", "op": ">=", "value": 3},
+      "moments": {"fact": "hedge"},
+      "then": {
+        "why": "Three or more hedges ('I think', 'maybe', 'probably') weaken your claims in a debate.",
+        "tip": "State claims directly, then back them with evidence. Save qualifiers for when you truly concede a point.",
+        "drill": "Take your main argument and say it as one sentence that starts with 'The evidence shows'."
+      }
+    },
+    {
+      "id": 22, "key": "no_star", "name": "Answers missing structure", "area": "Structure", "kind": "fix", "severity": 0.5,
+      "occasions": ["interview"],
+      "if": {"all": [
+        {"fact": "star_ratio", "op": "<", "value": 0.5},
+        {"fact": "answer", "min_count": 2}
+      ]},
+      "then": {
+        "why": "Most of your answers were missing part of the Situation, Task, Action, Result story, often the result.",
+        "tip": "End every behavioral answer with the result, ideally with a number.",
+        "drill": "For your top 3 stories, write one line each for Situation, Task, Action, and Result."
+      }
+    },
+    {
+      "id": 23, "key": "over_time", "name": "Over the time limit", "area": "Timing", "kind": "fix", "severity": 0.7,
+      "occasions": ["all"],
+      "if": {"fact": "time_used_ratio", "op": ">", "value": 1.1},
+      "then": {
+        "why": "You went more than 10% over your time limit. In the real thing you'd get cut off.",
+        "tip": "Cut your weakest section entirely rather than rushing through everything.",
+        "drill": "Time each section separately and trim the longest one by a third."
+      }
+    },
+    {
+      "id": 24, "key": "under_time", "name": "Well under the time limit", "area": "Timing", "kind": "fix", "severity": 0.3,
+      "occasions": ["presentation", "speech", "pitch"],
+      "if": {"fact": "time_used_ratio", "op": "<", "value": 0.6},
+      "then": {
+        "why": "You used less than 60% of your time, so there's room to go deeper.",
+        "tip": "Add one example or story to your most important point.",
+        "drill": "For each main point, add one 'for example' sentence."
+      }
+    },
+    {
+      "id": 25, "key": "flat_face", "name": "Flat expression", "area": "Body language", "kind": "fix", "severity": 0.3,
+      "occasions": ["speech", "presentation", "pitch"],
+      "if": {"all": [
+        {"fact": "face_animated_pct", "op": "<", "value": 15},
+        {"fact": "smiles_per_min", "op": "<", "value": 0.5}
+      ]},
+      "then": {
+        "why": "Your face stayed very still and you rarely smiled, so your words carried less warmth.",
+        "tip": "Smile when you greet the audience and let your face react to your own story.",
+        "drill": "Practice in front of a mirror and smile on purpose at your opening and closing lines."
+      }
+    },
+    {
+      "id": 26, "key": "too_quiet", "name": "Too quiet", "area": "Voice", "kind": "fix", "severity": 0.4,
+      "occasions": ["all"],
+      "if": {"fact": "volume_db", "op": "<", "value": -35},
+      "then": {
+        "why": "Your voice was quiet in the recording, which makes you sound less confident.",
+        "tip": "Project to the back of the room, from your belly rather than your throat.",
+        "drill": "Practice your opening as if the listener is across the street, then bring it down halfway."
+      }
+    },
+    {
+      "id": 27, "key": "low_energy", "name": "Low energy", "area": "Combined", "kind": "fix", "severity": 0.8,
+      "occasions": ["pitch"],
+      "if": {"all": [
+        {"fact": "monotone", "op": "==", "value": true},
+        {"fact": "too_slow", "op": "==", "value": true}
+      ]},
+      "suppresses": [2, 6],
+      "then": {
+        "why": "A slow, flat delivery makes it hard for investors to believe you're excited about your own idea.",
+        "tip": "Stand up, speed up a little, and let your voice rise when you talk about what makes this big.",
+        "drill": "Pitch your idea to a friend in 30 seconds as if you just found out you won."
+      }
+    },
+
+    {
+      "id": 30, "key": "good_pace", "name": "Great pace", "area": "Pace", "kind": "strength", "severity": 0.5,
+      "occasions": ["all"],
+      "if": {"fact": "pace_wpm", "op": "between", "value": [130, 165]},
+      "then": {"why": "You spoke at a comfortable pace that's easy to follow.", "tip": "", "drill": ""}
+    },
+    {
+      "id": 31, "key": "few_fillers", "name": "Clean, filler free speech", "area": "Fillers", "kind": "strength", "severity": 0.6,
+      "occasions": ["all"],
+      "if": {"all": [
+        {"fact": "filler_per_min", "op": "<", "value": 2},
+        {"fact": "word_count", "op": ">=", "value": 60}
+      ]},
+      "then": {"why": "You used very few filler words, so you sound prepared and sure.", "tip": "", "drill": ""}
+    },
+    {
+      "id": 32, "key": "intentional_pauses", "name": "Intentional pauses", "area": "Pauses", "kind": "strength", "severity": 0.5,
+      "occasions": ["all"],
+      "if": {"fact": "emphasis_pause_per_min", "op": "between", "value": [3, 12]},
+      "then": {"why": "You paused between ideas, which gives your points room to land.", "tip": "", "drill": ""}
+    },
+    {
+      "id": 33, "key": "strong_eye_contact", "name": "Strong eye contact", "area": "Body language", "kind": "strength", "severity": 0.6,
+      "occasions": ["all"],
+      "if": {"fact": "eye_contact_pct", "op": ">=", "value": 75},
+      "then": {"why": "You looked at your audience most of the time, which builds trust.", "tip": "", "drill": ""}
+    },
+    {
+      "id": 34, "key": "vocal_variety", "name": "Lively voice", "area": "Voice", "kind": "strength", "severity": 0.5,
+      "occasions": ["all"],
+      "if": {"fact": "pitch_sd_hz", "op": ">=", "value": 35},
+      "then": {"why": "Your pitch moved naturally, which keeps people listening.", "tip": "", "drill": ""}
+    },
+    {
+      "id": 35, "key": "confident_claims", "name": "Confident, direct language", "area": "Language", "kind": "strength", "severity": 0.5,
+      "occasions": ["debate", "pitch", "interview"],
+      "if": {"all": [
+        {"fact": "hedge_count", "op": "==", "value": 0},
+        {"fact": "word_count", "op": ">=", "value": 80}
+      ]},
+      "then": {"why": "You stated things directly with no hedging.", "tip": "", "drill": ""}
+    },
+    {
+      "id": 36, "key": "natural_gestures", "name": "Natural gestures", "area": "Body language", "kind": "strength", "severity": 0.4,
+      "occasions": ["presentation", "pitch", "speech", "debate"],
+      "if": {"fact": "gesture_pct", "op": "between", "value": [25, 70]},
+      "then": {"why": "You used your hands naturally to support what you said.", "tip": "", "drill": ""}
+    },
+    {
+      "id": 37, "key": "strong_close", "name": "Clear ask", "area": "Structure", "kind": "strength", "severity": 0.6,
+      "occasions": ["pitch"],
+      "if": {"fact": "has_cta_end", "op": "==", "value": true},
+      "then": {"why": "You closed with a clear call to action.", "tip": "", "drill": ""}
+    },
+    {
+      "id": 38, "key": "concise_answers", "name": "Concise, structured answers", "area": "Structure", "kind": "strength", "severity": 0.6,
+      "occasions": ["interview"],
+      "if": {"all": [
+        {"fact": "answer", "min_count": 1},
+        {"not": {"fact": "answer", "op": ">", "value": 120}},
+        {"fact": "star_ratio", "op": ">=", "value": 0.5}
+      ]},
+      "then": {"why": "Your answers were focused and followed a clear story structure.", "tip": "", "drill": ""}
+    }
+  ]
+}
