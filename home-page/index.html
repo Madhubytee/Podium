@@ -1,0 +1,625 @@
+<title>Podium</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Courier+Prime:wght@400;700&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a rehearsal script. Content sits straight on the paper: script lines for Oli's exchanges, a coach's marked up transcript for feedback, thin rules instead of boxes. The forest only lives in the opening scene. */
+:root {
+  --ink: #33261C;
+  --ink-soft: #6B5544;
+  --ink-mute: #8A725F;
+  --line: #4A3527;
+  --page: #FAF3E8;
+  --sky: #F4DBC1;
+  --side: #F1E7D9;
+  --rule: #E2D2BD;
+  --tomato: #C4513A;
+  --tomato-deep: #A23F2A;
+  --olive: #5F6E33;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Figtree", "Segoe UI", system-ui, sans-serif;
+  --script: "Courier Prime", "Courier New", ui-monospace, monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--page); color: var(--ink); font-family: var(--body); font-size: 16px; font-weight: 500; line-height: 1.55; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--tomato); outline-offset: 3px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.wrap { width: 100%; max-width: 1120px; margin: 0 auto; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
+.wordmark { font-family: var(--display); font-weight: 700; font-size: 26px; letter-spacing: -0.8px; color: var(--ink); text-decoration: none; line-height: 1; }
+.wordmark span { color: var(--tomato); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 22px; border-radius: 5px; border: 0; font-weight: 700; font-size: 16px; cursor: pointer; text-decoration: none; transition: background .15s, transform .1s; }
+.btn:active { transform: translateY(1px); }
+.btn.primary { background: var(--tomato); color: #FFF8F2; }
+.btn.primary:hover { background: var(--tomato-deep); }
+.link { color: var(--ink); font-weight: 600; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
+.link:hover { color: var(--tomato-deep); }
+h1, h2, h3 { font-family: var(--display); letter-spacing: -0.02em; text-wrap: balance; }
+/* the coach's marks */
+.um { text-decoration: underline wavy var(--tomato); text-decoration-thickness: 1.5px; text-underline-offset: 5px; text-decoration-skip-ink: none; }
+.mk { font-family: var(--body); font-size: .62em; font-weight: 700; color: var(--tomato-deep); vertical-align: super; margin-left: 1px; }
+.pause { font-family: var(--body); font-size: .72em; font-weight: 700; color: var(--olive); white-space: nowrap; }
+
+/* ================= Landing ================= */
+.topnav { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30; background: var(--sky); border-bottom: 1px solid rgba(51, 38, 28, .1); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 31; background: var(--sky); }
+.topnav .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 64px; }
+.topnav nav { display: flex; align-items: center; gap: 24px; }
+.topnav nav a:not(.btn) { color: var(--ink); text-decoration: none; font-weight: 600; font-size: 15px; }
+.topnav nav a:not(.btn):hover { color: var(--tomato-deep); }
+.topnav .btn { min-height: 40px; padding: 0 16px; font-size: 15px; }
+
+.hero { position: relative; height: max(620px, calc(100vh - 64px)); overflow: hidden; background: var(--sky); --h: max(620px, calc(100vh - 64px)); }
+.art { position: absolute; inset: 0; }
+.scene { position: absolute; bottom: 0; left: 50%; width: max(100%, calc(var(--h) * 1.7914)); aspect-ratio: 2576 / 1438; transform: translateX(-50%); background: url("forest.webp") center / 100% 100% no-repeat; }
+.scene .oli { position: absolute; left: 20.1%; bottom: 13.6%; width: 22.5%; -webkit-mask-image: linear-gradient(to right, transparent 0, #000 14%); mask-image: linear-gradient(to right, transparent 0, #000 14%); }
+.scene .oli img { display: block; width: 100%; height: auto; }
+/* speech bubble drawn in the illustration's own line style */
+.say { position: absolute; left: 23%; bottom: 44.5%; width: 16.5%; min-width: 220px; opacity: 0; transform: translateY(8px) scale(.96); transform-origin: 45% 100%; transition: opacity .35s ease, transform .35s cubic-bezier(.3, 1.4, .6, 1); }
+.say.on { opacity: 1; transform: none; }
+.say .shape { position: absolute; inset: 0 0 -16px 0; width: 100%; height: calc(100% + 16px); overflow: visible; }
+.say p { position: relative; margin: 0; padding: 14px 18px 16px; font-family: var(--display); font-weight: 600; font-size: 16px; line-height: 1.3; color: var(--ink); }
+.hero-copy { position: relative; z-index: 2; margin-left: 44%; width: min(520px, 40%); padding-top: 9vh; }
+.hero-copy h1 { margin: 0; font-weight: 700; font-size: clamp(40px, 4.6vw, 64px); line-height: 1.0; letter-spacing: -0.035em; }
+.hero-copy p { margin: 18px 0 0; max-width: 40ch; font-size: 19px; line-height: 1.5; color: #4A3929; }
+.hero-copy .ctas { margin-top: 26px; display: flex; flex-wrap: wrap; align-items: center; gap: 20px; }
+.hero-copy .btn { min-height: 54px; font-size: 17px; padding: 0 26px; }
+
+.band { padding-block: 96px; }
+.band + .band { border-top: 1px solid var(--rule); }
+.kicker { margin: 0 0 10px; font-weight: 700; font-size: 15px; color: var(--tomato-deep); }
+.band h2 { margin: 0; font-size: clamp(30px, 3.4vw, 44px); line-height: 1.08; font-weight: 700; max-width: 22ch; }
+.band .intro { margin: 14px 0 0; max-width: 58ch; font-size: 18px; color: var(--ink-soft); }
+
+/* how it works: three columns divided by rules, nothing boxed */
+.flow { margin-top: 52px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.moment { padding: 0 32px; }
+.moment:first-child { padding-left: 0; }
+.moment:last-child { padding-right: 0; }
+.moment + .moment { border-left: 1px solid var(--rule); }
+.moment h3 { margin: 0 0 4px; font-size: 21px; font-weight: 600; }
+.moment > p { margin: 0 0 22px; color: var(--ink-soft); }
+.picks { list-style: none; margin: 0; padding: 0; }
+.picks li { display: flex; align-items: baseline; gap: 8px; padding: 7px 0; font-weight: 600; font-size: 16px; }
+.picks li::after { content: ""; order: 2; flex: 1; border-bottom: 1.5px dotted #C9B59D; transform: translateY(-4px); }
+.picks li em { order: 3; font-style: normal; font-weight: 500; font-size: 14px; color: var(--ink-mute); }
+.picks li.sel { color: var(--tomato-deep); }
+.picks li.sel em { color: var(--tomato-deep); }
+.script { font-family: var(--script); font-size: 16px; line-height: 1.5; }
+.script .cue { display: block; margin-top: 14px; font-weight: 700; letter-spacing: .08em; font-size: 13px; color: var(--ink-mute); }
+.script .cue:first-child { margin-top: 0; }
+.script .cue.oli { color: var(--tomato-deep); }
+.script .cue small { font-weight: 400; letter-spacing: 0; text-transform: none; }
+.script p { margin: 2px 0 0; }
+.fixes { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 20px; }
+.fixes li { display: grid; grid-template-columns: 34px 1fr; gap: 8px; }
+.fixes .n { font-family: var(--display); font-weight: 700; font-size: 34px; line-height: .9; color: var(--tomato); }
+.fixes b { display: block; font-size: 16.5px; }
+.fixes span { display: block; font-size: 15px; color: var(--ink-soft); }
+
+/* feedback: a marked up transcript with margin notes */
+.markup { margin-top: 52px; display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 0 56px; }
+.page-head { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding-bottom: 12px; margin-bottom: 26px; border-bottom: 2px solid var(--ink); }
+.page-head b { font-family: var(--script); font-weight: 700; font-size: 15px; letter-spacing: .06em; }
+.page-head span { font-size: 13.5px; font-weight: 600; color: var(--ink-mute); }
+.transcript { margin: 0; font-family: var(--script); font-size: 21px; line-height: 1.95; }
+.notes { list-style: none; margin: 0; padding: 0 0 0 24px; border-left: 2px solid var(--tomato); display: flex; flex-direction: column; gap: 22px; }
+.notes .n { font-family: var(--display); font-weight: 700; color: var(--tomato-deep); margin-right: 6px; }
+.notes b { font-size: 16.5px; }
+.notes p { margin: 3px 0 0; font-size: 15px; color: var(--ink-soft); }
+.notes .clip { display: inline-block; margin-top: 6px; font-size: 14px; font-weight: 700; color: var(--tomato-deep); text-decoration: underline; text-underline-offset: 3px; }
+.notes .good .n { color: var(--olive); }
+.stats { grid-column: 1 / -1; margin-top: 40px; padding-top: 18px; border-top: 1px solid var(--rule); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.stat { padding: 0 20px; }
+.stat:first-child { padding-left: 0; }
+.stat + .stat { border-left: 1px solid var(--rule); }
+.stat b { display: block; font-family: var(--display); font-size: 40px; font-weight: 700; line-height: 1.05; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.stat b small { font-size: 16px; font-weight: 600; color: var(--ink-mute); letter-spacing: 0; }
+.stat span { font-size: 14px; font-weight: 600; color: var(--ink-soft); }
+.stat.flag b { color: var(--tomato-deep); }
+
+/* rules: typeset, not carded */
+.rules { margin-top: 48px; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 56px; align-items: start; }
+.rule { margin: 0; font-family: var(--display); font-weight: 500; font-size: clamp(24px, 2.6vw, 32px); line-height: 1.3; letter-spacing: -0.01em; }
+.rule .w { font-family: var(--script); font-weight: 700; font-size: .62em; letter-spacing: .1em; color: var(--tomato-deep); vertical-align: 2px; margin-right: 6px; }
+.rule-src { margin: 14px 0 0; font-size: 14px; color: var(--ink-mute); font-weight: 600; }
+.points { margin: 0; padding: 0; list-style: none; }
+.points li { padding: 16px 0; border-top: 1px solid var(--rule); }
+.points li:last-child { border-bottom: 1px solid var(--rule); }
+.points b { display: block; font-size: 17px; }
+.points span { color: var(--ink-soft); }
+
+.final { background: var(--sky); }
+.final .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 24px; }
+.final .with { display: flex; align-items: center; gap: 20px; }
+.final img { width: 110px; height: auto; flex: none; }
+.final h2 { max-width: 18ch; }
+footer { padding-block: 28px calc(28px + env(safe-area-inset-bottom, 0px)); font-size: 14px; color: var(--ink-soft); }
+footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
+
+/* ================= App ================= */
+.app { display: flex; min-height: 100vh; }
+.side { flex: none; width: 264px; background: var(--side); border-right: 1px solid var(--rule); display: flex; flex-direction: column; gap: 12px; padding-top: calc(16px + env(safe-area-inset-top, 0px)); padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px)); padding-left: max(12px, env(safe-area-inset-left, 0px)); padding-right: 12px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+.side-head { display: flex; align-items: center; justify-content: space-between; padding: 0 6px; min-height: 40px; }
+.side-head .wordmark { font-size: 23px; }
+.icon-btn { width: 40px; height: 40px; border: 0; border-radius: 5px; background: transparent; display: grid; place-items: center; cursor: pointer; color: var(--ink-soft); }
+.icon-btn:hover { background: rgba(51, 38, 28, .07); color: var(--ink); }
+.side .icon-btn { display: none; }
+.new-btn { display: flex; align-items: center; gap: 10px; min-height: 42px; padding: 0 10px; border: 0; border-radius: 5px; background: transparent; font-weight: 600; cursor: pointer; text-align: left; }
+.new-btn .plus { width: 24px; height: 24px; border-radius: 4px; background: var(--tomato); color: #fff; display: grid; place-items: center; }
+.new-btn:hover, .new-btn.on { background: rgba(51, 38, 28, .08); }
+.group { display: flex; flex-direction: column; gap: 1px; }
+.group h3 { margin: 8px 0 4px; padding: 0 10px; font-family: var(--body); letter-spacing: 0; font-size: 12.5px; font-weight: 600; color: var(--ink-mute); }
+.thread { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 8px; padding: 8px 10px; border-radius: 5px; color: var(--ink); text-decoration: none; font-size: 14.5px; min-height: 38px; }
+.thread:hover { background: rgba(51, 38, 28, .07); }
+.thread .tn { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.thread .tk { font-size: 12px; color: var(--ink-mute); font-variant-numeric: tabular-nums; }
+.side-foot { margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 12px 8px 0; border-top: 1px solid var(--rule); font-size: 14px; font-weight: 600; }
+.avatar { width: 32px; height: 32px; border-radius: 4px; background: var(--olive); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 11px; }
+.scrim { position: fixed; inset: 0; z-index: 35; background: rgba(51, 38, 28, .35); }
+
+.main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.main-top { display: flex; align-items: center; gap: 8px; min-height: 60px; padding-top: env(safe-area-inset-top, 0px); padding-left: 20px; padding-right: max(20px, env(safe-area-inset-right, 0px)); border-bottom: 1px solid var(--rule); }
+.main-top .menu { display: none; }
+.main-top .crumb { font-weight: 600; font-size: 15px; }
+.main-top .crumb span { color: var(--ink-mute); font-weight: 500; }
+.body { flex: 1; padding-block: 48px 72px; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
+.setup { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 34px; }
+.ask { display: flex; align-items: flex-end; gap: 18px; }
+.ask img { width: 104px; height: 104px; object-fit: contain; flex: none; }
+.ask h1 { margin: 0; font-size: clamp(30px, 3.6vw, 40px); font-weight: 700; line-height: 1.08; }
+.ask p { margin: 6px 0 0; color: var(--ink-soft); font-size: 16.5px; }
+.label { display: block; margin: 0 0 8px; padding: 0; font-weight: 700; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-mute); }
+.label small { font-weight: 500; letter-spacing: 0; text-transform: none; font-size: 13.5px; margin-left: 6px; }
+/* occasion tabs on a baseline */
+.tabs { display: flex; gap: 26px; overflow-x: auto; border-bottom: 1px solid var(--rule); scrollbar-width: none; }
+.occ { flex: none; display: inline-flex; align-items: center; gap: 7px; min-height: 46px; padding: 0 2px; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px; background: none; font-weight: 600; font-size: 16px; color: var(--ink-soft); cursor: pointer; }
+.occ:hover { color: var(--ink); }
+.occ[aria-checked="true"] { color: var(--ink); border-bottom-color: var(--tomato); }
+/* notes: ruled lines, no box */
+.notes-in textarea { display: block; width: 100%; min-height: 117px; resize: vertical; border: 0; padding: 4px 0 0; font-size: 17px; line-height: 39px;
+  background: transparent repeating-linear-gradient(to bottom, transparent 0, transparent 38px, var(--rule) 38px, var(--rule) 39px); background-attachment: local; }
+.notes-in textarea::placeholder { color: var(--ink-mute); }
+.notes-in textarea:focus-visible { outline: none; background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 38px, #CDB69C 38px, #CDB69C 39px); }
+.notes-in.over textarea { background-color: rgba(95, 110, 51, .08); }
+.attach-row { margin-top: 10px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; font-size: 14.5px; }
+.attach { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; font-weight: 700; color: var(--tomato-deep); cursor: pointer; }
+.attach:hover { text-decoration: underline; text-underline-offset: 3px; }
+.attach:focus-within { outline: 3px solid var(--tomato); outline-offset: 2px; }
+.attach-hint { color: var(--ink-mute); }
+.chip { display: inline-flex; align-items: center; gap: 2px; font-weight: 600; }
+.chip button { width: 32px; height: 32px; border: 0; background: none; cursor: pointer; display: grid; place-items: center; color: var(--ink-mute); border-radius: 4px; }
+.chip button:hover { color: var(--ink); background: rgba(51, 38, 28, .07); }
+/* the sentence */
+.madlib { margin: 0; font-family: var(--display); font-weight: 500; font-size: clamp(22px, 2.6vw, 28px); line-height: 1.75; letter-spacing: -0.01em; }
+.madlib select { appearance: none; border: 0; border-bottom: 2.5px solid var(--tomato); border-radius: 0; background: transparent; font: inherit; font-weight: 600; color: var(--tomato-deep); padding: 0 18px 0 2px; cursor: pointer; field-sizing: content;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%23A23F2A' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") right 2px center / 11px no-repeat; }
+.madlib select:focus-visible { outline: 3px solid var(--tomato); outline-offset: 2px; }
+/* mode as a plain choice list */
+.modes { margin: 0; padding: 0; border: 0; }
+.mode { display: grid; grid-template-columns: 22px 1fr; gap: 12px; padding: 14px 0; border-top: 1px solid var(--rule); cursor: pointer; }
+.mode:last-child { border-bottom: 1px solid var(--rule); }
+.mode input { appearance: none; margin: 3px 0 0; width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--ink-mute); display: grid; place-items: center; cursor: pointer; }
+.mode input:checked { border-color: var(--tomato); }
+.mode input:checked::after { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--tomato); }
+.mode b { display: block; font-size: 16.5px; }
+.mode span.d { display: block; font-size: 15px; color: var(--ink-soft); }
+.start-row { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+.start-row .btn { min-height: 54px; font-size: 17px; padding: 0 28px; }
+.start-row span { font-size: 14.5px; color: var(--ink-soft); }
+
+/* session as a script */
+.session { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 30px; }
+.line .cue { font-family: var(--script); font-weight: 700; letter-spacing: .1em; font-size: 13px; color: var(--ink-mute); }
+.line.oli .cue { color: var(--tomato-deep); }
+.line .you { margin: 4px 0 0; font-family: var(--script); font-size: 17px; line-height: 1.55; white-space: pre-wrap; }
+.line .meta { margin-top: 6px; font-size: 14px; color: var(--ink-mute); font-weight: 600; }
+.oli-line { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 18px; align-items: start; }
+.oli-line img { width: 92px; height: 92px; object-fit: contain; }
+.oli-line .lead { margin: 4px 0 0; color: var(--ink-soft); font-size: 16px; }
+.oli-line .q { margin: 8px 0 0; font-family: var(--display); font-weight: 600; font-size: clamp(24px, 2.8vw, 30px); line-height: 1.25; letter-spacing: -0.015em; }
+.rec { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 26px; padding-top: 20px; border-top: 2px solid var(--ink); }
+.rec .chk { flex: 1 1 260px; font-size: 14.5px; color: var(--ink-soft); }
+.rec .chk b { display: block; color: var(--ink); font-size: 16px; }
+.timer { font-family: var(--script); font-weight: 700; font-size: 22px; font-variant-numeric: tabular-nums; }
+.timer span { color: var(--ink-mute); font-weight: 400; }
+
+@media (max-width: 900px) {
+  .topnav nav a:not(.btn) { display: none; }
+  .hero { height: auto; display: flex; flex-direction: column; --h: max(380px, 60vh); }
+  .hero-copy { margin: 0; width: auto; padding: 36px max(20px, env(safe-area-inset-right, 0px)) 8px max(20px, env(safe-area-inset-left, 0px)); }
+  .hero-copy h1 { font-size: clamp(36px, 9vw, 48px); }
+  .hero-copy p { font-size: 17.5px; }
+  .art { position: relative; inset: auto; height: max(380px, 60vh); }
+  .scene { transform: translateX(-35.4%); }
+  .say { left: 35.4%; width: 240px; min-width: 0; margin-left: -120px; bottom: 44%; }
+  .flow { grid-template-columns: minmax(0, 1fr); gap: 40px; }
+  .moment, .moment:first-child, .moment:last-child { padding: 0; }
+  .moment + .moment { border-left: 0; border-top: 1px solid var(--rule); padding-top: 32px; }
+  .markup, .rules { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  .transcript { font-size: 18px; }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 18px; }
+  .stat:nth-child(3) { border-left: 0; padding-left: 0; }
+  .band { padding-block: 64px; }
+  .side { position: fixed; z-index: 40; left: 0; top: 0; bottom: 0; height: auto; transform: translateX(-100%); transition: transform .2s; }
+  .side.open { transform: none; box-shadow: 0 0 40px rgba(51,38,28,.3); }
+  .side .icon-btn { display: grid; }
+  .main-top .menu { display: grid; }
+  .ask img { width: 80px; height: 80px; }
+  .oli-line { grid-template-columns: 60px minmax(0, 1fr); }
+  .oli-line img { width: 60px; height: 60px; }
+}
+@media (min-width: 901px) { .scrim { display: none; } }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+</style>
+
+<div id="landing">
+  <header class="topnav">
+    <div class="wrap">
+      <a class="wordmark" href="#home">podium<span>.</span></a>
+      <nav aria-label="Main">
+        <a href="#how">How it works</a>
+        <a href="#feedback">Feedback</a>
+        <a class="btn primary" href="#practice">Start practicing</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero" aria-label="Podium">
+    <div class="hero-copy">
+      <h1>Rehearse it out loud before it counts.</h1>
+      <p>Oli plays the interviewer, investor, or opponent, then tells you the two things to fix before the real thing.</p>
+      <div class="ctas">
+        <a class="btn primary" href="#practice">Start practicing</a>
+        <a class="link" href="#how">See how it works</a>
+      </div>
+    </div>
+    <div class="art">
+      <div class="scene" aria-hidden="true">
+        <div class="oli"><img id="heroOli" src="oli-hello.webp" alt="" width="582" height="400"></div>
+        <div class="say" id="say">
+          <svg class="shape" viewBox="0 0 220 104" preserveAspectRatio="none" aria-hidden="true"><path d="M14 3 C 70 0, 150 1, 206 3 C 214 4, 217 9, 217 17 L 217 72 C 217 80, 213 85, 205 86 L 112 87 L 96 102 L 92 87 L 15 86 C 7 85, 3 80, 3 72 L 3 17 C 3 9, 7 4, 14 3 Z" fill="#FFF8EE" stroke="#4A3527" stroke-width="2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>
+          <p>So, tell me about a time you disagreed with a teammate.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="how">
+    <div class="wrap">
+      <p class="kicker">How a rehearsal goes</p>
+      <h2>Pick the moment, say it out loud, fix two things.</h2>
+      <div class="flow">
+        <div class="moment">
+          <h3>You pick what's coming up</h3>
+          <p>Add your resume, slides, or script so Oli knows the details.</p>
+          <ul class="picks">
+            <li class="sel">Job interview<em>Oli asks</em></li>
+            <li>Pitch<em>Oli pushes back</em></li>
+            <li>Presentation<em>You record</em></li>
+            <li>Speech or toast<em>You record</em></li>
+            <li>Debate<em>Oli argues</em></li>
+          </ul>
+        </div>
+        <div class="moment">
+          <h3>Oli plays the part</h3>
+          <p>He asks out loud and follows up when an answer is vague.</p>
+          <div class="script">
+            <span class="cue oli">OLI</span>
+            <p>Why this internship, and why now?</p>
+            <span class="cue">YOU</span>
+            <p><span class="um">Um</span>, so I've been building speaking tools, <span class="um">like</span>, all year...</p>
+            <span class="cue oli">OLI <small>(following up)</small></span>
+            <p>What did one of those tools actually change for users?</p>
+          </div>
+        </div>
+        <div class="moment">
+          <h3>You get two fixes, not twenty</h3>
+          <p>The most important issues first, each with a clip of the moment.</p>
+          <ol class="fixes">
+            <li><span class="n">1</span><div><b>Slow down your opening</b><span>182 words per minute in the first 30 seconds.</span></div></li>
+            <li><span class="n">2</span><div><b>Swap "um" for a pause</b><span>6 fillers per minute, mostly at the start of answers.</span></div></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="feedback">
+    <div class="wrap">
+      <p class="kicker">Feedback</p>
+      <h2>See exactly where it slipped.</h2>
+      <p class="intro">Podium listens to your words and your voice, and watches eye contact and gestures if your camera is on. Then it marks up your answer the way a coach would.</p>
+      <div class="markup">
+        <div class="page-head"><b>TAKE 2 · SWE INTERNSHIP INTERVIEW</b><span>Example report</span></div>
+        <p class="transcript"><span class="um">So</span>, on our capstone project, <span class="um">um</span>, a teammate wanted to rebuild the backend the week before the deadline. <span class="pause">‖ 3.4s</span><span class="mk">1</span> I, <span class="um">like</span>, didn't think we had time, so we compared both plans with our TA and kept the old backend. We shipped on time, and the TA used our plan as an example for the next class.<span class="mk">2</span></p>
+        <ol class="notes">
+          <li><span class="n">1</span><b>You lost your place mid answer</b><p>A 3.4 second pause in the middle of a sentence. Anchor each answer to three words: situation, action, result.</p><a class="clip" href="#feedback">Watch the moment, 0:42</a></li>
+          <li><span class="n">2</span><b>Your answer ran 2 minutes 40</b><p>Interview answers land best under two minutes. Lead with the result next time.</p><a class="clip" href="#feedback">Watch the moment, 1:10</a></li>
+          <li class="good"><span class="n">✓</span><b>Keep doing this</b><p>Strong eye contact while you gave your example.</p></li>
+        </ol>
+        <div class="stats">
+          <div class="stat flag"><b>182 <small>wpm</small></b><span>Pace, aim for 130 to 160</span></div>
+          <div class="stat"><b>6 <small>/min</small></b><span>Filler words</span></div>
+          <div class="stat"><b>71%</b><span>Eye contact</span></div>
+          <div class="stat"><b>2:40</b><span>Answer length</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <p class="kicker">Why you can trust it</p>
+      <h2>Coaching rules written with real speaking experts.</h2>
+      <div class="rules">
+        <div>
+          <p class="rule"><span class="w">IF</span>an interview answer runs past two minutes, <span class="w">THEN</span>suggest the STAR format and ending on the result.</p>
+          <p class="rule-src">One of the 17 rules Oli follows, reviewed by our domain experts.</p>
+        </div>
+        <ul class="points">
+          <li><b>Every tip shows its reason.</b><span>Tap "Why this feedback?" to see the rule and the moment it came from.</span></li>
+          <li><b>Feedback depends on the occasion.</b><span>A pause that works in a toast reads as lost in an interview.</span></li>
+          <li><b>It remembers your last take.</b><span>Oli tells you what improved before he gives you anything new.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="band final">
+    <div class="wrap">
+      <div class="with"><img src="oli-pitch.webp" alt="" width="110" height="110"><h2>Your next big moment is coming. Practice it first.</h2></div>
+      <a class="btn primary" href="#practice">Start practicing</a>
+    </div>
+  </section>
+  <footer><div class="wrap"><span class="wordmark" style="font-size: 18px">podium<span>.</span></span><span>Group 21 · University of Florida</span></div></footer>
+</div>
+
+<div class="app" id="app" hidden>
+  <aside class="side" id="side" aria-label="Rehearsals">
+    <div class="side-head">
+      <a class="wordmark" href="#home">podium<span>.</span></a>
+      <button class="icon-btn" type="button" id="closeSide" aria-label="Close rehearsals">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <button class="new-btn on" type="button" id="newBtn">
+      <span class="plus"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span>
+      New rehearsal
+    </button>
+    <div class="group">
+      <h3>Today</h3>
+      <a class="thread" href="#practice"><span class="tn">SWE internship interview</span><span class="tk">Take 3</span></a>
+      <a class="thread" href="#practice"><span class="tn">Demo day pitch</span><span class="tk">Take 5</span></a>
+    </div>
+    <div class="group">
+      <h3>Previous 7 days</h3>
+      <a class="thread" href="#practice"><span class="tn">Class final presentation</span><span class="tk">Take 2</span></a>
+      <a class="thread" href="#practice"><span class="tn">Should AI grade essays?</span><span class="tk">Take 1</span></a>
+      <a class="thread" href="#practice"><span class="tn">Product manager mock interview</span><span class="tk">Take 4</span></a>
+    </div>
+    <div class="group">
+      <h3>October</h3>
+      <a class="thread" href="#practice"><span class="tn">Best friend's wedding toast</span><span class="tk">Take 4</span></a>
+      <a class="thread" href="#practice"><span class="tn">Hackathon finals pitch</span><span class="tk">Take 2</span></a>
+    </div>
+    <div class="side-foot"><span class="avatar" aria-hidden="true">YOU</span>Your account</div>
+  </aside>
+  <div class="scrim" id="scrim" hidden></div>
+
+  <main class="main">
+    <div class="main-top">
+      <button class="icon-btn menu" type="button" id="openSide" aria-label="Open rehearsals" aria-controls="side">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+      </button>
+      <span class="crumb" id="crumb">New rehearsal</span>
+    </div>
+
+    <div class="body" id="setupView">
+      <form class="setup" id="setup" novalidate>
+        <div class="ask">
+          <img id="askOli" src="oli-interview.webp" alt="Oli" width="104" height="104">
+          <div>
+            <h1>What are we practicing?</h1>
+            <p id="askSub">Oli will play your interviewer and ask follow ups out loud.</p>
+          </div>
+        </div>
+
+        <div>
+          <span class="label" id="occLabel">The occasion</span>
+          <div class="tabs" role="radiogroup" aria-labelledby="occLabel" id="occRow"></div>
+        </div>
+
+        <p class="madlib">
+          It runs about <label class="sr" for="time">Length</label><select id="time"></select>
+          and I'm talking to <label class="sr" for="aud">Audience</label><select id="aud"></select>.
+        </p>
+
+        <div>
+          <label class="label" for="details">Notes for Oli <small>optional, but his questions get better</small></label>
+          <div class="notes-in" id="field"><textarea id="details" rows="3"></textarea></div>
+          <div class="attach-row">
+            <label class="attach" for="files">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M21 12.5l-8.5 8.5a6 6 0 0 1-8.5-8.5L13 3.5a4 4 0 0 1 5.7 5.7l-8.6 8.6a2 2 0 0 1-2.8-2.8L15 7.3"/></svg>
+              Attach files
+              <input class="sr" type="file" id="files" multiple accept=".pdf,.doc,.docx,.txt,.md,.ppt,.pptx,.key">
+            </label>
+            <span class="attach-hint" id="fileHint">like your resume or the job post</span>
+            <span id="chips" aria-label="Attached files" style="display: contents"></span>
+          </div>
+        </div>
+
+        <fieldset class="modes">
+          <legend class="label">How you want to practice</legend>
+          <label class="mode"><input type="radio" name="mode" value="live" id="mLive" checked><span><b>Talk it through with Oli</b><span class="d" id="liveDesc">He asks questions out loud and you answer, like the real thing.</span></span></label>
+          <label class="mode"><input type="radio" name="mode" value="record" id="mRec"><span><b>Record the whole thing</b><span class="d">Give it start to finish. Feedback comes at the end.</span></span></label>
+        </fieldset>
+
+        <div class="start-row">
+          <button class="btn primary" type="submit" id="startBtn">Start interview</button>
+          <span>Uses your microphone. Camera is optional.</span>
+        </div>
+      </form>
+    </div>
+
+    <div class="body" id="sessionView" hidden>
+      <div class="session" id="session"></div>
+    </div>
+  </main>
+</div>
+
+<script>
+(function () {
+  var OCC = [
+    { id: 'interview', name: 'Job interview', live: true, img: 'oli-interview.webp',
+      sub: 'Oli will play your interviewer and ask follow ups out loud.',
+      ph: 'Behavioral interview for a software engineering internship, two people on the panel...',
+      files: 'like your resume or the job post', time: ['15 minutes', '30 minutes', '45 minutes', '60 minutes'], t: 1,
+      aud: ['recruiters', 'a hiring manager', 'a panel', 'a professor'], role: 'He asks questions out loud and you answer, like the real thing.',
+      start: 'Start interview', lead: "I'll be your interviewer today. Answer out loud like it's the real thing.", q: 'Tell me a little about yourself and why this role caught your eye.' },
+    { id: 'pitch', name: 'Pitch', live: true, img: 'oli-pitch.webp',
+      sub: 'Oli will play an investor and push back on anything shaky.',
+      ph: 'Three minute demo day pitch for our study app. We end by asking for pilot schools...',
+      files: 'like your pitch deck', time: ['1 minute', '3 minutes', '5 minutes', '10 minutes'], t: 1,
+      aud: ['investors', 'judges', 'customers', 'my class'], role: 'He listens like an investor, then asks the hard questions.',
+      start: 'Start pitching', lead: "I'm an investor with five minutes. Win me over.", q: "Go ahead whenever you're ready. I'll jump in when something sounds shaky." },
+    { id: 'presentation', name: 'Presentation', live: false, img: 'oli-presentation.webp',
+      sub: 'Give the whole talk. Oli watches pace, clarity, and eye contact.',
+      ph: 'Ten minute class presentation on renewable energy, with slides...',
+      files: 'like your slides', time: ['5 minutes', '10 minutes', '15 minutes', '20 minutes'], t: 1,
+      aud: ['my class', 'a professor', 'coworkers', 'a conference room'], role: 'He asks audience style questions when you finish.',
+      start: 'Start recording', lead: 'Showtime. Give me the whole talk from start to finish.', q: "When you finish, I'll show you the two things to fix first." },
+    { id: 'speech', name: 'Speech or toast', live: false, img: 'oli-speech.webp',
+      sub: 'Weddings, graduations, awards. Oli listens like a guest.',
+      ph: "Four minute toast at my best friend's wedding. One funny story, one sweet ending...",
+      files: 'like your draft', time: ['2 minutes', '4 minutes', '6 minutes', '10 minutes'], t: 1,
+      aud: ['friends and family', 'graduates', 'coworkers', 'a big crowd'], role: 'He reacts like a guest and tells you what he remembers.',
+      start: 'Start recording', lead: 'Deliver it like the room is full.', q: "I'll tell you where it lands and where to slow down." },
+    { id: 'debate', name: 'Debate', live: true, img: 'oli-debate.webp',
+      sub: 'Oli takes the other side and argues back.',
+      ph: 'I argue that schools should allow AI tools on homework. Opening, then two rebuttals...',
+      files: 'like your notes', time: ['3 minutes', '5 minutes', '8 minutes', '12 minutes'], t: 1,
+      aud: ['judges', 'my class', 'an opponent', 'an open audience'], role: 'He argues the other side, and you rebut.',
+      start: 'Start the debate', lead: "I'm taking the other side. Make your claim clearly.", q: "Give me your opening statement. I'll rebut, then it's your turn." }
+  ];
+  var $ = function (id) { return document.getElementById(id); };
+  var state = { occ: OCC[0], files: [] };
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  //oli flies in and lands, then asks his question and idles
+  var hero = $('heroOli');
+  if (reduce) { hero.src = 'oli-still.webp'; $('say').classList.add('on'); }
+  else {
+    setTimeout(function () { $('say').classList.add('on'); }, 2400);
+    setTimeout(function () { hero.src = 'oli-idle.webp'; }, 10000);
+  }
+
+  //#practice is the app, anything else is the landing page
+  function route() {
+    var app = location.hash === '#practice';
+    $('landing').hidden = app; $('app').hidden = !app;
+    if (app) window.scrollTo(0, 0);
+  }
+  window.addEventListener('hashchange', route); route();
+
+  OCC.forEach(function (o) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'occ'; b.setAttribute('role', 'radio'); b.textContent = o.name;
+    b.addEventListener('click', function () { pick(o); });
+    $('occRow').appendChild(b);
+  });
+  $('occRow').addEventListener('keydown', function (e) {
+    var i = OCC.indexOf(state.occ), n = OCC.length;
+    if (e.key === 'ArrowRight') i = (i + 1) % n; else if (e.key === 'ArrowLeft') i = (i - 1 + n) % n; else return;
+    e.preventDefault(); pick(OCC[i]); $('occRow').children[i].focus();
+  });
+  function fill(sel, list, idx) { sel.innerHTML = ''; list.forEach(function (v, i) { sel.add(new Option(v, v, i === idx, i === idx)); }); }
+  function pick(o) {
+    state.occ = o;
+    Array.prototype.forEach.call($('occRow').children, function (b, i) { var on = OCC[i] === o; b.setAttribute('aria-checked', on); b.tabIndex = on ? 0 : -1; });
+    $('askOli').src = o.img; $('askSub').textContent = o.sub;
+    $('details').placeholder = o.ph; $('fileHint').textContent = state.files.length ? '' : o.files;
+    fill($('time'), o.time, o.t); fill($('aud'), o.aud, 0);
+    $('liveDesc').textContent = o.role;
+    (o.live ? $('mLive') : $('mRec')).checked = true;
+    syncStart();
+  }
+  function syncStart() { $('startBtn').textContent = $('mRec').checked ? 'Start recording' : state.occ.start; }
+  $('mLive').addEventListener('change', syncStart); $('mRec').addEventListener('change', syncStart);
+
+  //files from the picker or dropped on the notes
+  function addFiles(list) { Array.prototype.forEach.call(list, function (f) { if (!state.files.some(function (x) { return x.name === f.name; })) state.files.push(f); }); draw(); }
+  function draw() {
+    var box = $('chips'); box.innerHTML = '';
+    state.files.forEach(function (f, i) {
+      var c = document.createElement('span'); c.className = 'chip';
+      c.innerHTML = '<span></span><button type="button"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>';
+      c.firstChild.textContent = f.name;
+      var b = c.querySelector('button'); b.setAttribute('aria-label', 'Remove ' + f.name);
+      b.addEventListener('click', function () { state.files.splice(i, 1); draw(); });
+      box.appendChild(c);
+    });
+    $('fileHint').textContent = state.files.length ? '' : state.occ.files;
+  }
+  $('files').addEventListener('change', function (e) { addFiles(e.target.files); e.target.value = ''; });
+  var field = $('field');
+  ['dragenter', 'dragover'].forEach(function (n) { field.addEventListener(n, function (e) { e.preventDefault(); field.classList.add('over'); }); });
+  ['dragleave', 'drop'].forEach(function (n) { field.addEventListener(n, function (e) { e.preventDefault(); field.classList.remove('over'); }); });
+  field.addEventListener('drop', function (e) { if (e.dataTransfer) addFiles(e.dataTransfer.files); });
+
+  //start turns the setup into a script with oli in character
+  $('setup').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var o = state.occ, live = $('mLive').checked, d = $('details').value.trim();
+    var s = $('session'); s.innerHTML = '';
+    var you = document.createElement('div'); you.className = 'line';
+    you.innerHTML = '<div class="cue">YOU</div><p class="you"></p><div class="meta"></div>';
+    you.querySelector('.you').textContent = d || ('Practicing a ' + o.name.toLowerCase() + '.');
+    you.querySelector('.meta').textContent = [o.name, $('time').value, 'talking to ' + $('aud').value].concat(state.files.map(function (f) { return f.name; })).join(' · ');
+    s.appendChild(you);
+
+    var oli = document.createElement('div'); oli.className = 'line oli oli-line';
+    oli.innerHTML = '<img alt="Oli" width="92" height="92"><div><div class="cue">OLI</div><p class="lead"></p><p class="q"></p></div>';
+    oli.querySelector('img').src = o.img;
+    oli.querySelector('.lead').textContent = o.lead;
+    oli.querySelector('.q').textContent = o.q;
+    s.appendChild(oli);
+
+    var mins = parseInt($('time').value, 10) || 0;
+    var rec = document.createElement('div'); rec.className = 'rec';
+    rec.innerHTML = '<div class="chk"><b></b>Your browser will ask for your microphone. The camera is optional.</div><span class="timer">0:00 <span>/ ' + mins + ':00</span></span><button class="btn primary" type="button"></button>';
+    rec.querySelector('b').textContent = live ? 'Answer out loud when you are ready' : 'Record when you are ready';
+    rec.querySelector('button').textContent = live ? 'Answer out loud' : 'Start recording';
+    s.appendChild(rec);
+
+    $('crumb').textContent = o.name + ' ';
+    var sp = document.createElement('span'); sp.textContent = '· Take 1'; $('crumb').appendChild(sp);
+    $('newBtn').classList.remove('on');
+    $('setupView').hidden = true; $('sessionView').hidden = false; window.scrollTo(0, 0);
+  });
+
+  function newRehearsal() {
+    state.files = []; draw(); $('details').value = ''; pick(OCC[0]);
+    $('sessionView').hidden = true; $('setupView').hidden = false; $('crumb').textContent = 'New rehearsal';
+    $('newBtn').classList.add('on'); closeSide();
+  }
+  $('newBtn').addEventListener('click', newRehearsal);
+
+  var side = $('side'), scrim = $('scrim');
+  function openSide() { side.classList.add('open'); scrim.hidden = false; }
+  function closeSide() { side.classList.remove('open'); scrim.hidden = true; }
+  $('openSide').addEventListener('click', openSide);
+  $('closeSide').addEventListener('click', closeSide);
+  scrim.addEventListener('click', closeSide);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeSide(); });
+
+  pick(OCC[0]);
+})();
+</script>
